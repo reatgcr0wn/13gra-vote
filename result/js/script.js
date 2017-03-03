@@ -2,6 +2,12 @@ var width = 500,
   height = 500,
   radius = Math.min(width, height) / 2;
 
+var size = {
+  width : 500,
+  height: 500
+};
+
+
 var color = d3.scale.category10();
 
 var pie = d3.layout.pie()
@@ -21,7 +27,7 @@ var svg = d3.select("body").append("svg")
   .append("g")
   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-var data = [{"label":"one", "value":1}, 
+var data = [{"label":"one", "value":1},
             {"label":"two", "value":4}];
 
 var g = svg.datum(data).selectAll(".arc")
@@ -32,7 +38,7 @@ var g = svg.datum(data).selectAll(".arc")
 var path = g.append("path")
   .attr("d", arc)
   .style("fill", function(d,i) {
-    return ["#3498db","#e74c3c"][i]; 
+    return ["#3498db","#e74c3c"][i];
     // return color(d.value);
   })
   .each(function(d) {
@@ -126,6 +132,29 @@ function changeData(vote_01,vote_02) {
  change();
 }
 
+ var win  = d3.select(window); //←リサイズイベントの設定に使用します
 
+ function update(){
 
+  // 自身のサイズを取得する
+  size.width = parseInt(svg.style("width"));
+  size.height = parseInt(svg.style("height")); //←取得はしていますが、使用していません...
 
+  // 円グラフの外径を更新
+  arc.outerRadius(size.width / 2);
+
+  // 取得したサイズを元に拡大・縮小させる
+  svg
+    .attr("width", size.width)
+    .attr("height", size.width);
+
+  // それぞれのグループの位置を調整
+  var g = svg.selectAll(".arc")
+    .attr("transform", "translate(" + (size.width / 2) + "," + (size.width / 2) + ")");
+
+  // パスのサイズを調整
+  g.selectAll("path").attr("d", arc);
+}
+
+update();
+win.on("resize", update); // ウィンドウのリサイズイベントにハンドラを設定
